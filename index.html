@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Flag</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="stylesheet" href="static/css/style.css">
+	<script type="text/javascript" src="static/js/jquery-3.3.1.min.js"></script>
+</head>
+<body class="relative">
+	<div class="w_full h_full">
+		<div class="relative max_w_640 div_center w_full h_full">
+			<!-- 分享 -->
+			<div class="bg_setting absolute top left w_full h_full" id="result">
+			</div>
+			<!-- 结束升旗 -->
+			<div class="bg_setting absolute top left w_full h_full" id="ending">
+				<div class="table_cell verticle_middle">
+					<div class="" style="margin-top: 160px;">
+						<span>您是第1位为母校升旗的人</span><br>
+						<span>赶紧分享到朋友圈</span><br>
+						<span>邀请更多的人为母校升旗吧</span><br>
+						<button class="e_btn div_center" style="display: inline-block;margin-right: 10px;" onclick="changeRisePic()">再升一次</button>
+						<button class="e_btn div_center" style="display: inline-block;" onclick="gotoShare()">升旗接力</button>
+					</div>
+				</div>
+			</div>
+			<!-- 升旗进行时 -->
+			<div class="bg_setting absolute top left w_full h_full" id="raising">
+				<div class="w_full absolute top">
+					<img src="static/img/p17.png" width="100%">
+				</div>
+				<div class="absolute" id="flag" style="display: none;">
+					<img src="static/img/flag.gif" style="width: 100%;">
+				</div>
+				<div class="w_full absolute" style="display: none;" id="lPic">
+					<img src="static/img/p22.png" width="120px">
+				</div>
+				<img src="static/img/arrow.png" class="arrow absolute">
+			</div>
+			<!-- 升旗准备 -->
+			<div class="bg_setting relative w_full h_full" id="raise" style="">
+				<div class="w_full absolute">
+					<img src="static/img/p11.png" width="120px">
+				</div>
+				<div class="w_full absolute">
+					<img src="static/img/p10.png" width="120px">
+				</div>
+				<div class="w_full absolute">
+					<img src="static/img/p09.png" width="120px">
+				</div>
+				<div class="w_full absolute">
+					<img src="static/img/p08.png" width="120px">
+				</div>
+				<div class="w_full absolute">
+					<img id="p1" src="static/img/p04.png" width="120px">
+				</div>
+			</div>
+			<!-- 进度条 -->
+			<div class="progress_bar_group" id="progressBar" style="display: none;">
+				<div class="progress_bar h_full" id="song_bar">
+					<div class="progress w_full" style="height: 0px;"></div>
+				</div>
+				<div class="progress_bar h_full" id="control_bar">
+					<div class="progress w_full" style="height: 0px;"></div>
+				</div>
+			</div>
+			<!-- 升旗入口 -->
+			<div class="bg_setting absolute top left w_full h_full" id="enterence" style="">
+				<div class="absolute" id="an_balloon">
+					<img src="static/img/p01.png">
+				</div>
+				<div class="absolute" id="an_cloudsT">
+					<img src="static/img/p23.png">
+				</div>
+				<div class="table_cell verticle_middle">
+					<span>祝福矿大109岁</span><br>
+					<span>我为母校升校旗</span>
+					<button class="e_btn div_center" onclick="eBtn(this)">升旗</button>
+				</div>
+				<div class="absolute right bottom" id="an_cloudsB">
+					<img src="static/img/p02.png" class="w_full">
+				</div>
+			</div>
+		</div>
+	</div>
+	<audio id="bgm" style="display: none;">
+		<source src="static/sound/陈奕迅 - 倾城.mp3" type="audio/mpeg">
+	</audio>
+<script>
+      var totalHeight = 900, progressHeight, totalTime = 10, startY = 0, currentY = 0, finalY = 0;
+      var mousedown = false, mousemove = false;
+      var t, aroudPic;
+      var date1, date2;
+      $(function() {
+        // getFlagNum();
+        $("#song_bar").height($(window).height());
+        $("#control_bar").height($(window).height());
+        progressHeight = $(window).height();
+        $("body").height(window.innerHeight);
+        $("#rising").children("div").eq(0).children("img").css("height",progressHeight);
+      })
+
+      function eventDown(e){
+        e.preventDefault();
+        mousedown = true;
+        startY = e.touches[0].pageY;
+      }
+
+      function eventMove(e){
+        e.preventDefault();
+        currentY = e.touches[0].pageY - startY;
+        if(mousedown){
+          if(currentY > 0){
+            moveFlag(e);
+          }
+        }
+      }
+
+      function eventUp(e){
+        e.preventDefault();
+        mousedown = false;
+        finalY = e.changedTouches[e.changedTouches.length - 1].pageY - startY + finalY;
+      }
+
+      function moveFlag(e){
+      	if(e.changedTouches){
+          var temp1 = e.changedTouches[e.changedTouches.length - 1];
+          currentY = temp1.pageY - startY;
+        }
+        if ($("#control_bar").children("div").css("height").split("px")[0] >= progressHeight) {
+	        	document.removeEventListener('touchstart', eventDown);
+	        	document.removeEventListener('touchend', eventUp);
+	        	document.removeEventListener('touchmove', eventMove);
+	        	document.removeEventListener('mousedown', eventDown, false);
+	        	document.removeEventListener('mouseup', eventUp, false);
+	        	document.removeEventListener('mousemove', eventMove, false);
+	        	$("#lPic").show();
+        }else {
+        	$("#control_bar").children("div").css({"height":(finalY+currentY)/15+"px"});
+			$("#flag").css("bottom",12+(finalY+currentY)/23+"px");
+        }
+      }
+
+      function eBtn(obj){
+  		$("#raise").bind("touchmove", function(e){
+  			e.preventDefault();
+  			$("#p1").remove();
+  			clearTimeout(t);
+  			$("#raise").unbind("touchmove");
+  			aroudPic = setInterval(removeOneTip, 1000);
+  		})
+      	$("#enterence").hide();
+      }
+
+      function removeOneTip(){
+      	$("#raise").children("div").eq($("#raise").children("div").length - 1).remove();
+      	if ($("#raise").children("div").length == 0) {
+      		clearInterval(aroudPic);
+      		$("#raise").hide();
+      		changeRisePic();
+      	}
+      }
+
+      function changeRisePic(){
+      	finalY = 0;
+      	clearTimeout(t);
+      	$("#flag").show();
+      	$("#flag").css("bottom", "12px");
+      	$("#raising").show();
+      	$("#control_bar").children("div").css("height","0px");
+      	$("#progressBar").show();
+      	$("#bgm")[0].play();
+      	$("#song_bar").children("div").css({"animation":"rflag " + totalTime +"s" + " linear"});
+      	date1 = new Date();
+      	document.addEventListener('touchstart', eventDown);
+        document.addEventListener('touchend', eventUp);
+        document.addEventListener('touchmove', eventMove);
+        document.addEventListener('mousedown', eventDown, false);
+        document.addEventListener('mouseup', eventUp, false);
+        document.addEventListener('mousemove', eventMove, false);
+        t = setTimeout(endSong, totalTime*1000);
+      }
+
+      function endSong(){
+      	$("#flag").hide();
+      	$("#bgm")[0].load();
+      	date2 = new Date();
+      	var tTime =(date2 - date1) / 1000;
+      	$("#progressBar").hide();
+      	$("#raising").hide();
+      	$("#result").show();
+      	if ( tTime >= 31 && tTime <= 41) {
+      		$("#reward").text("最佳旗手");
+      	} else {
+      		$("#reward").text("升旗手");
+      	}
+      	document.removeEventListener('touchstart', eventDown);
+        document.removeEventListener('touchend', eventUp);
+        document.removeEventListener('touchmove', eventMove);
+        document.removeEventListener('mousedown', eventDown, false);
+        document.removeEventListener('mouseup', eventUp, false);
+        document.removeEventListener('mousemove', eventMove, false);
+        clearTimeout(t);
+      }
+
+      function gotoShare(){
+      	$("#ending").hide();
+      }
+</script>
+</body>
+</html>
